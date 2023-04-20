@@ -1,0 +1,18 @@
+.login {
+    @apply relative overflow-hidden bg-white ;
+
+    &:before {
+        content: "";
+        @apply w-[57%] -mt-[28%] -mb-[15%] -ml-[13%] absolute inset-y-0 left-0 transform rotate-[-4deg] bg-primary rounded-[100%] ;
+
+    }
+    &:after {
+        content: "";
+        @apply w-[57%] -mt-[20%] -mb-[12%] -ml-[13%] absolute inset-y-0 left-0 transform rotate-[-4deg] bg-primary rounded-[100%];
+
+    }
+    .login__input {
+        min-width: 350px;
+
+    }
+}

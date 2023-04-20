@@ -1,0 +1,63 @@
+version: '3.8'
+services:
+  main:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: sm
+    command: 'php artisan serve --host=0.0.0.0 --port=8000'
+    volumes:
+      - .:/app
+    ports:
+      - '${APP_PORT:-8000}:8000'
+      - '${VITE_PORT:-5173}:${VITE_PORT:-5173}'
+      - '${LARAVEL_WEBSOCKETS_PORT:-6001}:6001'
+    depends_on:
+      - db
+  node:
+    image: node:18-alpine3.16
+    working_dir: /app
+    volumes:
+      - .:/app
+    entrypoint: /bin/sh -c "npm install && npm run dev"
+    depends_on:
+      - main
+
+  queue:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: 'php artisan queue:work'
+    depends_on:
+      - db
+
+  db:
+    platform: linux/x86_64
+    image: mysql:8.0
+    container_name: db
+    environment:
+      MYSQL_DATABASE: destinators
+      MYSQL_USER: admin
+      MYSQL_ROOT: admin
+      MYSQL_PASSWORD: admin
+      MYSQL_ROOT_PASSWORD: root
+    volumes:
+      - ./storage/dbdata:/var/lib/mysql
+    ports:
+      - 3306:3306
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: pma
+    links:
+      - db
+    environment:
+      PMA_HOST: db
+      PMA_PORT: 3306
+      PMA_ARBITRARY: 1
+    restart: always
+    ports:
+      - 8081:80
+networks:
+  sm:
+    driver: bridge
+
